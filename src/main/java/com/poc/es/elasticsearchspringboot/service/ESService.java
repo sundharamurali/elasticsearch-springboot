@@ -14,5 +14,7 @@ public interface ESService {
 
     public boolean bulkInsertEmployees(List<Employee> employees) throws IOException;
 
-    public List<Employee> fetchEmployees(Employee employee) throws IOException;
+    public List<Employee> fetchEmployeesWithMustQuery(Employee employee) throws IOException;
+    public List<Employee> fetchEmployeesWithShouldQuery(Employee employee) throws IOException;
+
 }

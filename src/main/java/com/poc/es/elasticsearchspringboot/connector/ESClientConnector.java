@@ -3,18 +3,20 @@ package com.poc.es.elasticsearchspringboot.connector;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.*;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import com.poc.es.elasticsearchspringboot.exception.RecordNotFoundException;
 import com.poc.es.elasticsearchspringboot.model.Employee;
 import com.poc.es.elasticsearchspringboot.utils.QueryBuilderUtils;
-import org.elasticsearch.client.RequestOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,26 +38,16 @@ public class ESClientConnector {
 
     public boolean bulkInsertEmployees(List<Employee> employeeList) throws IOException {
         BulkRequest.Builder builder = new BulkRequest.Builder();
-        employeeList.stream().forEach(employee -> {
+        employeeList.stream().forEach(employee ->
             builder.operations(op->
                     op.index(i->
                             i.index(index)
                                     .id(String.valueOf(employee.getId()))
-                                    .document(employee)));
-        });
+                                    .document(employee)))
+        );
         BulkResponse bulkResponse = elasticsearchClient.bulk(builder.build());
         return !bulkResponse.errors();
     }
-
-   /* public void updateEmployee(Employee employee) {
-
-        UpdateRequest request = UpdateRequest.of(r->
-                r.index(index)
-                        .id(String.valueOf(employee.getId()))
-                        .doc(employee));
-        elasticsearchClient.update(request, Employee.class, Employee.class);
-
-    }*/
 
     public Employee fetchEmployeeById(String id) throws RecordNotFoundException, IOException {
         GetResponse<Employee> response = elasticsearchClient.get(req->
@@ -67,26 +59,49 @@ public class ESClientConnector {
         return response.source();
     }
 
-    public List<Employee> fetchEmployees(Employee employee) throws IOException {
+    public List<Employee> fetchEmployeesWithMustQuery(Employee employee) throws IOException {
         List<Query> queries = prepareQueryList(employee);
         SearchResponse<Employee> employeeSearchResponse = elasticsearchClient.search(req->
                 req.index(index)
+                        .size(employee.getSize())
                         .query(query->
                                 query.bool(bool->
-                                        bool.must(queries))), Employee.class);
+                                        bool.must(queries))),
+                Employee.class);
 
-        List<Employee> employeeList = employeeSearchResponse.hits().hits().stream().map(hit->hit.source()).collect(Collectors.toList());
-        return employeeList;
+        return employeeSearchResponse.hits().hits().stream()
+                .map(Hit::source).collect(Collectors.toList());
+    }
+
+    public List<Employee> fetchEmployeesWithShouldQuery(Employee employee) throws IOException {
+        List<Query> queries = prepareQueryList(employee);
+        SearchResponse<Employee> employeeSearchResponse = elasticsearchClient.search(req->
+                        req.index(index)
+                                .size(employee.getSize())
+                                .query(query->
+                                        query.bool(bool->
+                                                bool.should(queries))),
+                Employee.class);
+
+        return employeeSearchResponse.hits().hits().stream()
+                .map(Hit::source).collect(Collectors.toList());
     }
 
     private List<Query> prepareQueryList(Employee employee) {
-        List<Query> queries = Arrays.asList(
-                QueryBuilderUtils.termQuery("firstName", employee.getFirstName()),
-                QueryBuilderUtils.termQuery("lastName", employee.getLastName()),
-                QueryBuilderUtils.termQuery("gender", employee.getGender())
+        Map<String, String> conditionMap = new HashMap<>();
+        conditionMap.put("firstName", employee.getFirstName());
+        conditionMap.put("lastName", employee.getLastName());
+        conditionMap.put("gender", employee.getGender());
+        conditionMap.put("jobTitle", employee.getJobTitle());
+        conditionMap.put("phone", employee.getPhone());
+        conditionMap.put("email", employee.getEmail());
 
-        );
+        List<Query> queries = conditionMap.entrySet().stream()
+                .filter(entry->!ObjectUtils.isEmpty(entry.getValue()))
+                .map(entry->QueryBuilderUtils.termQuery(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
         return queries;
     }
+
 
 }

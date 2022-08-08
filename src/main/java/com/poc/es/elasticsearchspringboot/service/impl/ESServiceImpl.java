@@ -32,7 +32,12 @@ public class ESServiceImpl implements ESService {
     }
 
     @Override
-    public List<Employee> fetchEmployees(Employee employee) throws IOException {
-        return esClientConnector.fetchEmployees(employee);
+    public List<Employee> fetchEmployeesWithMustQuery(Employee employee) throws IOException {
+        return esClientConnector.fetchEmployeesWithMustQuery(employee);
+    }
+
+    @Override
+    public List<Employee> fetchEmployeesWithShouldQuery(Employee employee) throws IOException {
+        return esClientConnector.fetchEmployeesWithShouldQuery(employee);
     }
 }

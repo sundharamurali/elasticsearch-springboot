@@ -23,9 +23,15 @@ public class ESRestController {
         return ResponseEntity.ok(employee);
     }
 
-    @PostMapping("/index/fetch")
-    public ResponseEntity<List<Employee>> fetchEmployees(@RequestBody Employee employeeSearchRequest) throws IOException {
-        List<Employee> employees = esService.fetchEmployees(employeeSearchRequest);
+    @PostMapping("/index/fetchWithMust")
+    public ResponseEntity<List<Employee>> fetchEmployeesWithMustQuery(@RequestBody Employee employeeSearchRequest) throws IOException {
+        List<Employee> employees = esService.fetchEmployeesWithMustQuery(employeeSearchRequest);
+        return ResponseEntity.ok(employees);
+    }
+
+    @PostMapping("/index/fetchWithShould")
+    public ResponseEntity<List<Employee>> fetchEmployeesWithShouldQuery(@RequestBody Employee employeeSearchRequest) throws IOException {
+        List<Employee> employees = esService.fetchEmployeesWithMustQuery(employeeSearchRequest);
         return ResponseEntity.ok(employees);
     }
 
