@@ -89,12 +89,12 @@ public class ESClientConnector {
 
     private List<Query> prepareQueryList(Employee employee) {
         Map<String, String> conditionMap = new HashMap<>();
-        conditionMap.put("firstName", employee.getFirstName());
-        conditionMap.put("lastName", employee.getLastName());
-        conditionMap.put("gender", employee.getGender());
-        conditionMap.put("jobTitle", employee.getJobTitle());
-        conditionMap.put("phone", employee.getPhone());
-        conditionMap.put("email", employee.getEmail());
+        conditionMap.put("firstName.keyword", employee.getFirstName());
+        conditionMap.put("lastName.keyword", employee.getLastName());
+        conditionMap.put("gender.keyword", employee.getGender());
+        conditionMap.put("jobTitle.keyword", employee.getJobTitle());
+        conditionMap.put("phone.keyword", employee.getPhone());
+        conditionMap.put("email.keyword", employee.getEmail());
 
         List<Query> queries = conditionMap.entrySet().stream()
                 .filter(entry->!ObjectUtils.isEmpty(entry.getValue()))
