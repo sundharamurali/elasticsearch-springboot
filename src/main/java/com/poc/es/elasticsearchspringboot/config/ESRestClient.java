@@ -27,11 +27,8 @@ import org.springframework.context.annotation.Configuration;
 public class ESRestClient {
 
     private String hostName;
-
     private int port;
-
     private String username;
-
     private String password;
 
     @Bean

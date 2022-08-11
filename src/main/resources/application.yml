@@ -1,0 +1,7 @@
+elastic:
+  index: employees
+es:
+  hostname: localhost
+  port: 9200
+  username: admin
+  password: password

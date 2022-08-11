@@ -30,6 +30,7 @@ public class ESClientConnector {
     public String insertEmployee(Employee employee) throws IOException {
         IndexRequest<Employee> request = IndexRequest.of(i->
                 i.index(index)
+                        .id(String.valueOf(employee.getId()))
                         .document(employee));
         IndexResponse response = elasticsearchClient.index(request);
         return response.result().toString();
