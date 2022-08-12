@@ -40,4 +40,14 @@ public class ESServiceImpl implements ESService {
     public List<Employee> fetchEmployeesWithShouldQuery(Employee employee) throws IOException {
         return esClientConnector.fetchEmployeesWithShouldQuery(employee);
     }
+
+    @Override
+    public String deleteEmployeeById(Long id) throws IOException {
+        return esClientConnector.deleteEmployeeById(id);
+    }
+
+    @Override
+    public String updateEmployee(Employee employee) throws IOException {
+        return esClientConnector.updateEmployee(employee);
+    }
 }

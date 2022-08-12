@@ -17,4 +17,8 @@ public interface ESService {
     public List<Employee> fetchEmployeesWithMustQuery(Employee employee) throws IOException;
     public List<Employee> fetchEmployeesWithShouldQuery(Employee employee) throws IOException;
 
+    public String deleteEmployeeById(Long id) throws IOException;
+
+    public String updateEmployee(Employee employee) throws IOException;
+
 }

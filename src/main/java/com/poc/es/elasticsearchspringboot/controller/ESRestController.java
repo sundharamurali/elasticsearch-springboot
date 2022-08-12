@@ -50,4 +50,16 @@ public class ESRestController {
             return ResponseEntity.internalServerError().body("Oops! unable to ingest data");
         }
     }
+
+    @DeleteMapping("/index/{id}")
+    public ResponseEntity<String> deleteEmployee(@PathVariable("id") Long id) throws IOException {
+        String status = esService.deleteEmployeeById(id);
+        return ResponseEntity.ok(status);
+    }
+
+    @PutMapping("/index")
+    public ResponseEntity<String> updateEmployee(@RequestBody Employee employee) throws IOException {
+        String status = esService.updateEmployee(employee);
+        return ResponseEntity.ok(status);
+    }
 }

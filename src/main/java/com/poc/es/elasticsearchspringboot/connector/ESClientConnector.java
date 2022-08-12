@@ -87,6 +87,23 @@ public class ESClientConnector {
                 .map(Hit::source).collect(Collectors.toList());
     }
 
+    public String deleteEmployeeById(Long id) throws IOException {
+        DeleteRequest request = DeleteRequest.of(req->
+                req.index(index).id(String.valueOf(id)));
+        DeleteResponse response = elasticsearchClient.delete(request);
+        return response.result().toString();
+    }
+
+    public String updateEmployee(Employee employee) throws IOException {
+        UpdateRequest<Employee, Employee> updateRequest = UpdateRequest.of(req->
+                req.index(index)
+                        .id(String.valueOf(employee.getId()))
+                        .doc(employee));
+        UpdateResponse<Employee> response = elasticsearchClient.update(updateRequest, Employee.class);
+        return response.result().toString();
+    }
+
+
     private List<Query> prepareQueryList(Employee employee) {
         Map<String, String> conditionMap = new HashMap<>();
         conditionMap.put("firstName.keyword", employee.getFirstName());
@@ -96,11 +113,10 @@ public class ESClientConnector {
         conditionMap.put("phone.keyword", employee.getPhone());
         conditionMap.put("email.keyword", employee.getEmail());
 
-        List<Query> queries = conditionMap.entrySet().stream()
+        return conditionMap.entrySet().stream()
                 .filter(entry->!ObjectUtils.isEmpty(entry.getValue()))
                 .map(entry->QueryBuilderUtils.termQuery(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
-        return queries;
     }
 
 
